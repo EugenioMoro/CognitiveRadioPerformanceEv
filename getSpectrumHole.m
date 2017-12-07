@@ -6,4 +6,4 @@ function[SpectrumHole]=getSpectrumHole()
 SpectrumHole.start=129; %first usable freq
 SpectrumHole.stop=192; %last usable freq
 SpectrumHole.width=64; %stop-start+1
-SpectrumHole.Active=0;
+SpectrumHole.Active=1;

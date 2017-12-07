@@ -3,7 +3,7 @@
 %demodulated symbols for further ber analysis
 %
 %NOTE: the channel in input
-function[Rx_Data]=incumbentRX(sysparam, Hvector,RxSignal,D)
+function[rxSymbols]=incumbentRX(sysparam, Hvector,RxSignal,D)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Ts = sysparam.Ts;                                              % Sampling period of channel
@@ -21,7 +21,8 @@ Multipath=1;
 
 SpectrumHole=getSpectrumHole();
 
-
+rxSymbols=zeros(length(EbNo),N,Nframes);
+berofdm=zeros(length(EbNo));
 %% Receiver
 for i=1:length(EbNo)
     for j=1:Nframes
@@ -42,6 +43,11 @@ for i=1:length(EbNo)
          Rx_Data(SpectrumHole.start:SpectrumHole.stop,j)=0;
         end
     end
+    rxSymbols(i,:,:)=Rx_Data;
+    if(SpectrumHole.active)
+       berofdm(i) = sum(sum(Rx_Data~=D))/((N-2*Np)*Nframes-SpectrumHole.size*Nframes);
+       berofdm(i)=berofdm(i)-(SpectrumHole.size/((N-2*Np)-SpectrumHole.size));
+    end
     berofdm(i) = sum(sum(Rx_Data~=D))/((N-2*Np)*Nframes);
 end
 
@@ -54,7 +60,7 @@ figure;
 semilogy(EbNo,berofdm,'--or','linewidth',2);
 if(PlotTheo)
     hold on;
-    theober=berawgn(EbNo, 'psk', M, 'nondiff');
+    theober=berawgn(EbNo, 'qam', M);
     semilogy(EbNo, theober);
 end
 grid on;

@@ -1,13 +1,15 @@
 %create channels
-%channelVector=generateChannels();
+channelVector=generateChannels();
 %fprintf('Channels generated\n');
 
 %generate incumbent tx signal
-%[TxData, D, Hvector]=incumbentTX(getIncumbentParameters());
-%fprintf('Incumbent tx signal generated');
+[TxData, D, H1vector]=incumbentTX(getIncumbentParameters(),channelVector(1));
+fprintf('Incumbent tx signal generated\n');
+
 
 %decode incumbent
-incumbentRX(getIncumbentParameters(),Hvector,TxData,D);
+RxSymbols=incumbentRX(getIncumbentParameters(),H1vector,TxData,D);
+fprintf('Incumbent Decoded, plotting ber...');
 
 
 

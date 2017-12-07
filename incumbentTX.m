@@ -4,7 +4,7 @@
 %
 %Data inputs are the channels, the system parameters and the spectrum hole
 %Outputs are the modulated signals for both channels, the random data transmitted
-function[TxData,D,Hvector]=incumbentTX(sysparam)
+function[TxData,D,Hvector]=incumbentTX(sysparam,channel)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Ts = sysparam.Ts;                                              % Sampling period of channel
@@ -22,10 +22,7 @@ else
 end
 Data = [zeros(Np,Nframes); Dmod ; zeros(Np,Nframes)];   % Pilot Insertion
 
-SpectrumHole.start=129;
-SpectrumHole.stop=192;
-SpectrumHole.width=64;
-SpectrumHole.Active=0;
+SpectrumHole=getSpectrumHole;
 
 Multipath=1;
 % 
@@ -50,12 +47,13 @@ Tx_Data = TxCy;
 
 %% Frequency selective channel with 4 taps 1->1
 if(Multipath)
-tau = [0 1e-5 3.5e-5 12e-5];                            % Path delays
-pdb = [0 -1 -1 -3];                                     % Avg path power gains
-h = rayleighchan(Ts, Fd, tau, pdb);
-h.StoreHistory = 0;
-h.StorePathGains = 1;
-h.ResetBeforeFiltering = 1;
+% tau = [0 1e-5 3.5e-5 12e-5];                            % Path delays
+% pdb = [0 -1 -1 -3];                                     % Avg path power gains
+% h = rayleighchan(Ts, Fd, tau, pdb);
+% h.StoreHistory = 0;
+% h.StorePathGains = 1;
+% h.ResetBeforeFiltering = 1;
+h=channel;
 end
 
 %% SNR of channel 1->1
