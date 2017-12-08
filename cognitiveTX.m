@@ -1,10 +1,11 @@
 %this function will create random data, modulate, transmit and return the
-%rx data on both the incumbent2incumbent channel and incumbent2cognitive
+%tx on both the cognitive2incumbent channel and cognitive2cognitive
 %channel
 %
-%Data inputs are the channels, the system parameters and the spectrum hole
+%Data inputs are the channels, the system parameters, the spectrum hole is
+%fetched internally
 %Outputs are the modulated signals for both channels, the random data transmitted
-function[TxSignal1,TxSignal2,D,Hvector]=incumbentTX(sysparam,channelVector)
+function[TxData,D,Hvector]=cognitiveTX(sysparam,channel1)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Ts = sysparam.Ts;                                              % Sampling period of channel
@@ -20,7 +21,7 @@ if(useQAM)
 else
     Dmod = pskmod(D,M); %create psk signal 
 end
-Data = [zeros(Np,Nframes); Dmod ; zeros(Np,Nframes)];   % Pilot Insertion
+Data = [zeros(Np,Nframes); Dmod ; zeros(Np,Nframes)];   % modulated signal(still in frequency)
 
 SpectrumHole=getSpectrumHole;
 
@@ -31,8 +32,10 @@ Multipath=1;
 
 if(SpectrumHole.Active)
     for i=1:Nframes
-        Data(SpectrumHole.start:SpectrumHole.stop,i)=0; %turn off the subcarriers in the spectrum hole
-        D(SpectrumHole.start:SpectrumHole.stop,i)=0; %set the corresponding bits to 0 (will do the same in rx data)
+        Data(1:(SpectrumHole.start-1),i)=0; %turn off the subcarriers outside of the spectrum hole (left here)
+        Data(SpectrumHole.stop+1:N,i)=0; %right
+        D(1:SpectrumHole.start-1,i)=0; %set the corresponding bits to 0 (will do the same in rx data)
+        D(SpectrumHole.stop+1:N,i)=0; %rigth
     end
 end
 
@@ -53,8 +56,7 @@ if(Multipath)
 % h.StoreHistory = 0;
 % h.StorePathGains = 1;
 % h.ResetBeforeFiltering = 1;
-h=channelVector(1);
-h2=channelVector(2);
+h=channel1;
 end
 
 %% SNR of channel 1->1
@@ -66,9 +68,9 @@ snr= EsNo - 10*log10(N/(N+Ncp));
 %initialize TxData for efficiency|not neseccary
 %TxData=zeros(length(snr),c,(N+Ncp));
 
-%% Transmit through channel 1
+%% Transmit through channel 1->1
 G=zeros(Nframes,N);
-TxSignal1 = zeros(length(snr),c,(N+Ncp));
+TxData = zeros(length(snr),c,(N+Ncp));
 Hvector=zeros(length(snr), Nframes,N);
 for i = 1:length(snr)
     for j = 1:c % Transmit frame by frame
@@ -82,22 +84,8 @@ for i = 1:length(snr)
         else
             y=awgn(Tx_Data(:,j),snr(i));
         end
-        TxSignal1(i,j,:)=y(1,:);
+        TxData(i,j,:)=y(1,:);
         Hvector(i,:,:)=G(:,:);
-    end
-end
-
-%% transmit through channel 2
-TxSignal2 = zeros(length(snr),c,(N+Ncp));
-for i = 1:length(snr)
-    for j = 1:c % Transmit frame by frame
-        if(Multipath)
-            hx2 = filter(h2,Tx_Data(:,j).');                  
-            y2 = awgn(hx2,snr(i));                          
-        else
-            y2=awgn(Tx_Data(:,j),snr(i));
-        end
-        TxSignal2(i,j,:)=y2(1,:);
     end
 end
 % 

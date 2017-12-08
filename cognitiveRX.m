@@ -3,7 +3,7 @@
 %demodulated symbols for further ber analysis
 %
 %NOTE: the channel in input
-function[rxSymbols]=incumbentRX(sysparam, Hvector,RxSignal,D)
+function[rxSymbols]=cognitiveRX(sysparam, Hvector,RxSignal,D)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Ts = sysparam.Ts;                                              % Sampling period of channel
@@ -23,11 +23,9 @@ SpectrumHole=getSpectrumHole();
 
 rxSymbols=zeros(length(EbNo),N,Nframes);
 berofdm=zeros(length(EbNo));
-Rx_Data=zeros(N+Np,Nframes);
-
 %% Receiver
 for i=1:length(EbNo)
-    for j=1:Nframes %in each frame remember to set received data to 0 if it's in the spectrum hole
+    for j=1:Nframes %at each frame must set data outside of spectrum hole to 0 or alternatively compute ber only inside
         Rx = RxSignal(i,j,(Ncp+1:(N+Ncp)));                                % Removal of cyclic prefix 
         if(Multipath)
             FFT_Data = (sqrt(N-Np)/N)*fft(Rx,N)./Hvector(i,j,:);   % Frequency Domain Equalization
@@ -39,18 +37,22 @@ for i=1:length(EbNo)
         else
             Rx_Data(:,j) = pskdemod(FFT_Data(Np+1:N-Np),M);
         end
-        Rx_Data(SpectrumHole.start:SpectrumHole.stop,j)=0; %set data in spectrum hole to 0
     end
-    if(SpectrumHole.Active)
-        for j = 1:Nframes %accumulate error count
-            berofdm(i)=berofdm(i)+sum(sum(Rx_Data(1:SpectrumHole.start-1,j)~=D(1:SpectrumHole.start-1,j))); %count left
-            berofdm(i)=berofdm(i)+sum(sum(Rx_Data(SpectrumHole.stop+1:(N-2*Np),j)~=D(SpectrumHole.stop+1:(N-2*Np),j))); %count rigth
+    if(SpectrumHole.Active) %set rx data(in symbols) to 0 if outside of shole (at each frame)
+        for j = 1:Nframes
+         Rx_Data(1:SpectrumHole.start-1,j)=0; %left
+         Rx_Data(SpectrumHole.stop+1:N,j)=0;  %right
         end
-        berofdm(i)=berofdm(i)/((N-2*Np-SpectrumHole.width)*Nframes);%finalize ber
-    else
-      berofdm(i) = sum(sum(Rx_Data~=D))/((N-2*Np)*Nframes); %spectrum hole not active
     end
     rxSymbols(i,:,:)=Rx_Data;
+    if(SpectrumHole.Active)
+        for j = 1:Nframes %accumulate error count
+            berofdm(i)=berofdm(i)+sum(sum(Rx_Data(SpectrumHole.start:SpectrumHole.stop,j)~=D(SpectrumHole.start:SpectrumHole.stop,j))); %count left
+        end
+        berofdm(i)=berofdm(i)/(SpectrumHole.width*Nframes);%finalize ber
+    else
+        berofdm(i) = sum(sum(Rx_Data~=D))/((N-2*Np)*Nframes);
+    end
 end
 
 
@@ -66,7 +68,7 @@ if(PlotTheo)
     semilogy(EbNo, theober);
 end
 grid on;
-title('BERvsEbN0 incumbent system');
+title('BERvsEbN0 cognitive system');
 xlabel('EbNo');
 ylabel('BER');
 end
