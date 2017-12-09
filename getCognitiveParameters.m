@@ -1,7 +1,7 @@
 %this function will return the ofdm parameters of the cognitive system
 function [sysparam]=getCognitiveParameters()
 
-sysparam.N = 1024;                                      % No of subcarriers
+sysparam.N = 1024;                                               % No of subcarriers
 sysparam.Ncp = 64;                                               % Cyclic prefix length
 sysparam.Ts = 1e-3;                                              % Sampling period of channel
 sysparam.Fd = 0;                                                 % Max Doppler frequency shift

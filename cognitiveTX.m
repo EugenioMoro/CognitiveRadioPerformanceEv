@@ -5,7 +5,7 @@
 %Data inputs are the channels, the system parameters, the spectrum hole is
 %fetched internally
 %Outputs are the modulated signals for both channels, the random data transmitted
-function[TxData,D,Hvector]=cognitiveTX(sysparam,channel1)
+function[TxSignal1,TxSignal2,D,Hvector]=cognitiveTX(sysparam,channelVector)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Ts = sysparam.Ts;                                              % Sampling period of channel
@@ -56,7 +56,8 @@ if(Multipath)
 % h.StoreHistory = 0;
 % h.StorePathGains = 1;
 % h.ResetBeforeFiltering = 1;
-h=channel1;
+h=channelVector(4);
+h2=channelVector(3);
 end
 
 %% SNR of channel 1->1
@@ -68,9 +69,9 @@ snr= EsNo - 10*log10(N/(N+Ncp));
 %initialize TxData for efficiency|not neseccary
 %TxData=zeros(length(snr),c,(N+Ncp));
 
-%% Transmit through channel 1->1
+%% Transmit through channel 4
 G=zeros(Nframes,N);
-TxData = zeros(length(snr),c,(N+Ncp));
+TxSignal1 = zeros(length(snr),c,(N+Ncp));
 Hvector=zeros(length(snr), Nframes,N);
 for i = 1:length(snr)
     for j = 1:c % Transmit frame by frame
@@ -84,8 +85,22 @@ for i = 1:length(snr)
         else
             y=awgn(Tx_Data(:,j),snr(i));
         end
-        TxData(i,j,:)=y(1,:);
+        TxSignal1(i,j,:)=y(1,:);
         Hvector(i,:,:)=G(:,:);
+    end
+end
+
+%% Transmit through channel 3
+TxSignal2 = zeros(length(snr),c,(N+Ncp));
+for i = 1:length(snr)
+    for j = 1:c % Transmit frame by frame
+        if(Multipath)
+            hx2 = filter(h2,Tx_Data(:,j).');                  
+            y2 = awgn(hx2,snr(i));                          
+        else
+            y2=awgn(Tx_Data(:,j),snr(i));
+        end
+        TxSignal2(i,j,:)=y2(1,:);
     end
 end
 % 

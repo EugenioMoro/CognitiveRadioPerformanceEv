@@ -90,27 +90,16 @@ berPlotter(Iber3,EbNo,'Incumbent sys performance with shifted interference, matc
 %decode and plot as usual
 fpincumbentTXsignal=fixPower(incumbentTXsignal,3); %fix power
 fpH1vector=fixPower(H1vector,3);
-
 [Iber4]=incumbentRX(getIncumbentParameters(),fpH1vector,fpincumbentTXsignal,incumbentD); %decode using fixed power signal
-berPlotter(Iber4,EbNo,'Incumbent sys performance with no interference, EbN0@10dB');
+berPlotter(Iber4,EbNo,'Incumbent sys performance with no interference, EbN0@15dB');
 
 [Iber5]=incumbentRX(getIncumbentParameters(),fpH1vector,fpincumbentTXsignal+cognitiveTXinterference,incumbentD); %decode using fixed power signal
-berPlotter(flip(Iber5),EbNo,'Incumbent sys performance with synch. interference, EbN0@10');
+berPlotter(flip(Iber5),EbNo,'Incumbent sys performance with synch. interference, EbN0@15');
 
 [Iber6]=incumbentRX(getIncumbentParameters(),fpH1vector,fpincumbentTXsignal+frequencyShift(cognitiveTXinterference,1e-1),incumbentD);
-berPlotter(flip(Iber6),EbNo,'Incumbent sys performance with shifted interference, EbN0@10');
+berPlotter(flip(Iber6),EbNo,'Incumbent sys performance with shifted interference, EbN0@15');
 
 checkber2=reshape([Iber4 Iber5 Iber6], 7, 3);
 
 %% plot fixed power cognitive @15dB and varying for incumbent
-fpcognitiveTXsignal=fixPower(cognitiveTXsignal,4);
-fpH2vector=fixPower(H2vector,4);
-
-[Cber4]=cognitiveRX(getCognitiveParameters(),fpH2vector,fpcognitiveTXsignal,cognitiveD); %decode using fixed power signal
-berPlotter(Cber4,EbNo,'COgnitive sys performance with no interference, EbN0@15dB');
-
-[Cber5]=cognitiveRX(getCognitiveParameters(),fpH2vector,fpcognitiveTXsignal+incumbentTXinterference,cognitiveD); %decode using fixed power signal
-berPlotter(flip(Cber5),EbNo,'Cognitive sys performance with synch. interference, EbN0@10');
-
-[Cber6]=cognitiveRX(getCognitiveParameters(),fpH2vector,fpcognitiveTXsignal+frequencyShift(incumbentTXinterference,1e-1),cognitiveD);
-berPlotter(flip(Cber6),EbNo,'Cognitive sys performance with shifted interference, EbN0@10');
+fpcognitiveTXsignal=fixpower(cognitiveTXsignal

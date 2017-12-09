@@ -3,7 +3,7 @@
 %demodulated symbols for further ber analysis
 %
 %NOTE: the channel in input
-function[rxSymbols]=cognitiveRX(sysparam, Hvector,RxSignal,D)
+function[berofdm]=cognitiveRX(sysparam, Hvector,RxSignal,D)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Ts = sysparam.Ts;                                              % Sampling period of channel
@@ -14,7 +14,7 @@ Nframes = sysparam.Nframes;                                         % No of OFDM
 useQAM=sysparam.useQAM;
 EbNo=sysparam.EbNo;
 
-PlotBER=1;
+PlotBER=0;
 PlotTheo=0;
 
 Multipath=1;
@@ -22,7 +22,7 @@ Multipath=1;
 SpectrumHole=getSpectrumHole();
 
 rxSymbols=zeros(length(EbNo),N,Nframes);
-berofdm=zeros(length(EbNo));
+berofdm=zeros(length(EbNo),1);
 %% Receiver
 for i=1:length(EbNo)
     for j=1:Nframes %at each frame must set data outside of spectrum hole to 0 or alternatively compute ber only inside
