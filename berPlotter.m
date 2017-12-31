@@ -4,5 +4,5 @@ figure;
 semilogy(EbNo,berofdm,'--or','linewidth',2);
 grid on;
 title(t);
-xlabel('EbNo');
+xlabel('EbNo [dB]');
 ylabel('BER');

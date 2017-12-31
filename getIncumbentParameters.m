@@ -10,4 +10,4 @@ sysparam.M = 16;                                                 % No of symbols
 sysparam.Nframes = 10^3;                                         % No of OFDM frames
 sysparam.useQAM=1;
 sysparam.Multipath=1;
-sysparam.EbNo=0:5:30;
+sysparam.EbNo=-10:5:30;

@@ -3,8 +3,10 @@
 %input 
 function [fixedPowerSignal]=fixPower(signal,index)
 fixedPowerSignal=signal;
-for i=1:7
-    for j=1:1000
+sysparam=getCognitiveParameters();
+
+for i=1:length(sysparam.EbNo)
+    for j=1:sysparam.Nframes
          fixedPowerSignal(i,j,:)=signal(index,j,:);
     end
 end

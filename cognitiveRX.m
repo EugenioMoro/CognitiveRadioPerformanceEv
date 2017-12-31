@@ -3,7 +3,7 @@
 %demodulated symbols for further ber analysis
 %
 %NOTE: the channel in input
-function[berofdm]=cognitiveRX(sysparam, Hvector,RxSignal,D)
+function[berofdm, rxSymbols]=cognitiveRX(sysparam, Hvector,RxSignal,D)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Ts = sysparam.Ts;                                              % Sampling period of channel
