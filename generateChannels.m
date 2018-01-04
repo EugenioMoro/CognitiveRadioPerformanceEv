@@ -1,7 +1,7 @@
 function [channelVector]=generateChannels()
 
 %common parameters
-Ts = 1e-3;                                              % Sampling period of channel
+Ts = 1e-5;                                              % Sampling period of channel
 Fd = 0; 
 
 %channel 1 FROM INCUMBENT TO INCUMBENT

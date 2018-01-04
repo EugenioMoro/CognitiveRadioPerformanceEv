@@ -20,6 +20,7 @@ fprintf('Channels generated\n');
 
 %% signal generation 
 %generate incumbent tx signals
+fprintf('Generating incumbent...\n');
 [incumbentTXsignal,incumbentTXinterference, incumbentD, H1vector]=incumbentTX(getIncumbentParameters(),channelVector);
 fprintf('Incumbent tx signals generated\n');
 
@@ -32,19 +33,21 @@ fprintf('Cognitive tx signal generated\n');
 fprintf('Decoding cognitive...\n');
 [Cber1,cognitiveRxSymbols]=cognitiveRX(getCognitiveParameters(),H2vector,cognitiveTXsignal,cognitiveD);
 
+
+
 fprintf('Summing signal and interference and decoding\n');
 dirtySignal=cognitiveTXsignal+incumbentTXinterference;
 Cber2=cognitiveRX(getCognitiveParameters(),H2vector,dirtySignal,cognitiveD);
 
 fprintf('Applying freq shift to interference and decoding\n');
-interf=frequencyShift(incumbentTXinterference, 1e-5);
+interf=frequencyShift(incumbentTXinterference, 1e-2);
 dirtySignal=cognitiveTXsignal+interf;
 [Cber3,cognitiveRxSymbols]=cognitiveRX(getCognitiveParameters(),H2vector,dirtySignal,cognitiveD);
 
 %% plot cognitive with matched ebno for both systems
 param=getIncumbentParameters();
 EbNo=param.EbNo;
-berPlotter(Cber1,EbNo,'Cognitive sys performance with no interference, matched power');
+berPlotter(Cber1,EbNo,'Cognitive sys performance with no interference');
 berPlotter(Cber2,EbNo,'Cognitive sys performance with synch. interference, matched power');
 berPlotter(Cber3,EbNo,'Cognitive sys performance with shifted interference, matched power');
 
@@ -67,7 +70,7 @@ Iber3=incumbentRX(getIncumbentParameters(),H1vector,dirtySignal,incumbentD);
 %% plot incumbent with matched ebno for both systems
 param=getIncumbentParameters();
 EbNo=param.EbNo;
-berPlotter(Iber1,EbNo,'Incumbent sys performance with no interference, matched power');
+berPlotter(Iber1,EbNo,'Incumbent sys performance with no interference');
 berPlotter(Iber2,EbNo,'Incumbent sys performance with synch. interference, matched power');
 berPlotter(Iber3,EbNo,'Incumbent sys performance with shifted interference, matched power');
 

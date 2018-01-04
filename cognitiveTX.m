@@ -8,8 +8,6 @@
 function[TxSignal1,TxSignal2,D,Hvector]=cognitiveTX(sysparam,channelVector)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
-Ts = sysparam.Ts;                                              % Sampling period of channel
-Fd = sysparam.Fd;                                                 % Max Doppler frequency shift
 Np = sysparam.Np;                                                 % No of pilot symbols
 M = sysparam.M;                                                  % No of symbols for modulation
 Nframes = sysparam.Nframes;                                         % No of OFDM frames
