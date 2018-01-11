@@ -16,7 +16,7 @@ for s=1:length(shift)
         bers(s)=ber(EbnoSig);
     end
 end
-semilogx(shift,bers);
+loglog(shift,bers);
 grid on;
 title('ser vs frequency shift of interference');
 xlabel('{\Delta}f');

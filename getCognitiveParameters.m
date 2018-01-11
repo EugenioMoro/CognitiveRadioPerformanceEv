@@ -10,3 +10,4 @@ sysparam.Nframes = 1000;                                         % No of OFDM fr
 sysparam.useQAM=1;
 sysparam.Multipath=1;
 sysparam.EbNo=0:5:30;
+sysparam.guardBand=10; %this number is the fft points to consider as (single)guard band 

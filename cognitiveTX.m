@@ -22,6 +22,10 @@ end
 Data = [zeros(Np,Nframes); Dmod ; zeros(Np,Nframes)];   % modulated signal(still in frequency)
 
 SpectrumHole=getSpectrumHole;
+if(sysparam.guardBand>0) %this if is not really necessary, but it's just to make the code clearer
+    SpectrumHole.start=SpectrumHole.start+sysparam.guardBand; %this code will make the guard band addition transparent to the transmission logic
+    SpectrumHole.stop=SpectrumHole.stop-sysparam.guardBand;
+end
 
 Multipath=1;
 % 

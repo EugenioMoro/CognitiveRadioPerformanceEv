@@ -19,6 +19,12 @@ Multipath=1;
 
 SpectrumHole=getSpectrumHole();
 
+SpectrumHole=getSpectrumHole;
+if(sysparam.guardBand>0) %this if is not really necessary, but it's just to make the code clearer
+    SpectrumHole.start=SpectrumHole.start+sysparam.guardBand; %this code will make the guard band addition transparent to the transmission logic
+    SpectrumHole.stop=SpectrumHole.stop-sysparam.guardBand;
+end
+
 rxSymbols=zeros(length(EbNo),N,Nframes);
 berofdm=zeros(length(EbNo),1);
 %% Receiver

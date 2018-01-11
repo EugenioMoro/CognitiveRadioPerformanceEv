@@ -33,8 +33,6 @@ fprintf('Cognitive tx signal generated\n');
 fprintf('Decoding cognitive...\n');
 [Cber1,cognitiveRxSymbols]=cognitiveRX(getCognitiveParameters(),H2vector,cognitiveTXsignal,cognitiveD);
 
-
-
 fprintf('Summing signal and interference and decoding\n');
 dirtySignal=cognitiveTXsignal+incumbentTXinterference;
 Cber2=cognitiveRX(getCognitiveParameters(),H2vector,dirtySignal,cognitiveD);
@@ -77,29 +75,73 @@ berPlotter(Iber3,EbNo,'Incumbent sys performance with shifted interference, matc
 %% plot incumbent with fixed power for incumbent (10db) and varying for cog
 %here we copy the incumbenttxsignal at ebno=10 over all the other val of ebno and
 %decode and plot as usual
-fpincumbentTXsignal=fixPower(incumbentTXsignal,5); %fix power
-fpH1vector=fixPower(H1vector,5);
+EbNoStep=3; 
+fpincumbentTXsignal=fixPower(incumbentTXsignal,EbNoStep); %fix power
+fpH1vector=fixPower(H1vector,EbNoStep);
 
 [Iber4]=incumbentRX(getIncumbentParameters(),fpH1vector,fpincumbentTXsignal,incumbentD); %decode using fixed power signal
-berPlotter(Iber4,EbNo,'Incumbent sys performance with no interference, EbN0@10dB');
+berPlotter(Iber4,EbNo,'Incumbent sys performance at fixed EbN0(10dB) with no interference');
 
 [Iber5]=incumbentRX(getIncumbentParameters(),fpH1vector,fpincumbentTXsignal+cognitiveTXinterference,incumbentD); %decode using fixed power signal
-berPlotter(flip(Iber5),EbNo,'Incumbent sys performance with synch. interference, EbN0@10');
+berPlotter(flip(Iber5),EbNo,'Incumbent sys performance at fixed EbN0(10dB) with synch. interference');
 
 [Iber6]=incumbentRX(getIncumbentParameters(),fpH1vector,fpincumbentTXsignal+frequencyShift(cognitiveTXinterference,1e-1),incumbentD);
-berPlotter(flip(Iber6),EbNo,'Incumbent sys performance with shifted interference, EbN0@10');
+berPlotter(flip(Iber6),EbNo,'Incumbent sys performance at fixed EbN0(10dB) with shifted interference (0.1*{\Delta}f');
 
 %checkber2=reshape([Iber4 Iber5 Iber6], 7, 3);
 
 %% plot fixed power cognitive @15dB and varying for incumbent
-fpcognitiveTXsignal=fixPower(cognitiveTXsignal,6);
-fpH2vector=fixPower(H2vector,6);
+EbNoStep=4;
+fpcognitiveTXsignal=fixPower(cognitiveTXsignal,EbNoStep);
+fpH2vector=fixPower(H2vector,EbNoStep);
 
 [Cber4]=cognitiveRX(getCognitiveParameters(),fpH2vector,fpcognitiveTXsignal,cognitiveD); %decode using fixed power signal
-berPlotter(Cber4,EbNo,'COgnitive sys performance with no interference, EbN0@15dB');
+berPlotter(Cber4,EbNo,'COgnitive sys performance at fixed EbN0(10dB) with no interference');
 
 [Cber5]=cognitiveRX(getCognitiveParameters(),fpH2vector,fpcognitiveTXsignal+incumbentTXinterference,cognitiveD); %decode using fixed power signal
-berPlotter(flip(Cber5),EbNo,'Cognitive sys performance with synch. interference, EbN0@10');
+berPlotter(flip(Cber5),EbNo,'Cognitive sys performance at fixed EbN0(10dB) with synch. interference');
 
 [Cber6]=cognitiveRX(getCognitiveParameters(),fpH2vector,fpcognitiveTXsignal+frequencyShift(incumbentTXinterference,1e-3),cognitiveD);
-berPlotter(flip(Cber6),EbNo,'Cognitive sys performance with shifted interference, EbN0@10');
+berPlotter(flip(Cber6),EbNo,'Cognitive sys performance at fixed EbN0(10dB) with shifted interference(0.001*{\Delta}f)');
+
+%% Interference power simulation for congnitive system
+
+%no interference
+[Cber1,cognitiveRxSymbols]=cognitiveRX(getCognitiveParameters(),H2vector,cognitiveTXsignal,cognitiveD);
+intPower=computeInterferencePower(cognitiveD,cognitiveRxSymbols);
+plot(intPower(1,:));
+title('Interference power with interference from other sys');
+hold on;
+grid on;
+plot(intPower(3,:));
+plot(intPower(7,:));
+%legend ('@0EbN0','@15EbN0', '@30EbN0');
+
+%interference from other system
+dirtySignal=cognitiveTXsignal+incumbentTXinterference;
+[Cber2,cognitiveRxSymbols]=cognitiveRX(getCognitiveParameters(),H2vector,dirtySignal,cognitiveD);
+intPower=computeInterferencePower(cognitiveD,cognitiveRxSymbols);
+plot(intPower(1,:));
+plot(intPower(3,:));
+plot(intPower(7,:));
+legend ('@0EbN0','@15EbN0', '@30EbN0','@0EbN0+Int','@15EbN0+Int', '@30EbN0+Int');
+xlabel('Subcarrier');
+ylabel('dB');
+
+%% Interference power vs Ebno
+
+%no interference, plot interf power vs ebno
+[Cber1,cognitiveRxSymbols]=cognitiveRX(getCognitiveParameters(),H2vector,cognitiveTXsignal,cognitiveD);
+intPower=computeInterferencePower(cognitiveD,cognitiveRxSymbols);
+
+plotThis=average(intPower);
+param=getCognitiveParameters();
+EbNo=param.EbNo;
+plot(EbNo, plotThis);
+title('Interference power vs EbN0');
+xlabel('EbN0[dB]');
+ylabel('dB');
+grid on;
+
+%% performance vs frequency shift evaluation 
+aaa=evaluateFrequencyShift(cognitiveTXsignal, incumbentTXinterference,6,6,1,H2vector,cognitiveD);
