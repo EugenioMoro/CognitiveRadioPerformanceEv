@@ -27,7 +27,7 @@ if(sysparam.guardBand>0) %this if is not really necessary, but it's just to make
     SpectrumHole.stop=SpectrumHole.stop-sysparam.guardBand;
 end
 
-Multipath=1;
+Multipath=sysparam.Multipath;
 % 
 % PlotTheo=0;
 % PlotBER=1;
@@ -36,7 +36,7 @@ if(SpectrumHole.Active)
     for i=1:Nframes
         Data(1:(SpectrumHole.start-1),i)=0; %turn off the subcarriers outside of the spectrum hole (left here)
         Data(SpectrumHole.stop+1:N,i)=0; %right
-        D(1:SpectrumHole.start-1,i)=0; %set the corresponding bits to 0 (will do the same in rx data)
+        D(1:SpectrumHole.start-1,i)=0; %set the corresponding symbols to 0 (will do the same in rx data)
         D(SpectrumHole.stop+1:N,i)=0; %rigth
     end
 end
@@ -65,7 +65,7 @@ end
 %% SNR of channel 1->1
 
 EbNo = sysparam.EbNo;
-EsNo= EbNo + 10*log10((N-2*Np)/N)+ 10*log10(N/(N+Ncp));      % symbol to noise ratio
+EsNo= EbNo + 10*log10((N-2*Np)/N)+ 10*log10(N/(N+Ncp)) + 10*log10(log2(M));      % symbol to noise ratio
 snr= EsNo - 10*log10(N/(N+Ncp));
 
 %initialize TxData for efficiency|not neseccary

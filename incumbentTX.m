@@ -22,7 +22,7 @@ Data = [zeros(Np,Nframes); Dmod ; zeros(Np,Nframes)];   % Pilot Insertion
 
 SpectrumHole=getSpectrumHole;
 
-Multipath=1;
+Multipath=sysparam.Multipath;
 % 
 % PlotTheo=0;
 % PlotBER=1;

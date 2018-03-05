@@ -3,7 +3,7 @@
 %demodulated symbols for further ber analysis
 %
 %NOTE: the channel in input
-function[berofdm]=incumbentRX(sysparam, Hvector,RxSignal,D)
+function[berofdm, rxSymbols]=incumbentRX(sysparam, Hvector,RxSignal,D)
 N = sysparam.N;                                                % No of subcarriers
 Ncp = sysparam.Ncp;                                               % Cyclic prefix length
 Np = sysparam.Np;                                                 % No of pilot symbols
@@ -15,13 +15,14 @@ EbNo=sysparam.EbNo;
 PlotBER=0;
 PlotTheo=0;
 
-Multipath=1;
+Multipath=sysparam.Multipath;
 
 SpectrumHole=getSpectrumHole();
 
 rxSymbols=zeros(length(EbNo),N,Nframes);
 berofdm=zeros(length(EbNo),1);
 Rx_Data=zeros(N+Np,Nframes);
+rxSymbols=zeros(length(EbNo),N,Nframes);
 
 %% Receiver
 for i=1:length(EbNo)
@@ -39,6 +40,7 @@ for i=1:length(EbNo)
         end
         Rx_Data(SpectrumHole.start:SpectrumHole.stop,j)=0; %set data in spectrum hole to 0
     end
+    rxSymbols(i,:,:)=Rx_Data;
     if(SpectrumHole.Active)
         for j = 1:Nframes %accumulate error count
             berofdm(i)=berofdm(i)+sum(sum(Rx_Data(1:SpectrumHole.start-1,j)~=D(1:SpectrumHole.start-1,j))); %count left

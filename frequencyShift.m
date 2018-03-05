@@ -3,7 +3,7 @@
 function [out]=frequencyShift(signal,shift)
 [E F N]=size(signal);
 timevector=(1:N);
-shifter=exp(-1i*2*pi*shift*timevector);
+shifter=exp(1i*2*pi*shift*timevector);
 out=zeros(E, F, N); 
 for e=1:E
     parfor f=1:F

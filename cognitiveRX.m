@@ -15,7 +15,7 @@ EbNo=sysparam.EbNo;
 PlotBER=0;
 PlotTheo=0;
 
-Multipath=1;
+Multipath=sysparam.Multipath;
 
 SpectrumHole=getSpectrumHole();
 

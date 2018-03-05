@@ -1,7 +1,7 @@
 function [bers]=evaluateFrequencyShift(signal, interference, EbnoSig, EbnoInt, isCognitive, Hvector, sentData)
 [E N F]=size(signal);
 %shift=[1e-5 1e-4 1e-3 1e-2 1e-1];
-shift=10.^(-[5:-0.5:1]);
+shift=10.^(-[5:-0.1:3]);
 bers=zeros(length(shift),1);
 interference=fixPower(interference,EbnoInt);
 for s=1:length(shift)
@@ -19,7 +19,7 @@ end
 loglog(shift,bers);
 grid on;
 title('ser vs frequency shift of interference');
-xlabel('{\Delta}f');
+xlabel('Shift ratio');
 ylabel('SER');
 
 
